@@ -24,6 +24,11 @@ const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
 
 export function TaskCard({ task, onToggleStatus }: TaskCardProps) {
   const isCompleted = task.status === "completed";
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="group relative flex flex-col gap-4 rounded-2xl border border-zinc-200 bg-white p-6 transition-all hover:shadow-lg dark:border-zinc-800 dark:bg-zinc-950/50">
@@ -51,7 +56,7 @@ export function TaskCard({ task, onToggleStatus }: TaskCardProps) {
         <div className="flex items-center gap-2">
           <span className="flex items-center gap-1 rounded-full bg-zinc-100 px-2.5 py-0.5 text-xs font-medium text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400">
             <Clock className="h-3 w-3" />
-            {new Date(task.createdAt).toLocaleDateString()}
+            {mounted ? new Date(task.createdAt).toLocaleDateString() : "Loading..."}
           </span>
           <button className="rounded-full p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
             <MoreVertical className="h-4 w-4 text-zinc-400" />
@@ -60,10 +65,10 @@ export function TaskCard({ task, onToggleStatus }: TaskCardProps) {
       </div>
 
       <div className="prose prose-sm dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-400">
-        <ReactMarkdown>{task.description}</ReactMarkdown>
+        {mounted && <ReactMarkdown>{task.description}</ReactMarkdown>}
       </div>
 
-      {task.chartData && task.chartData.length > 0 && (
+      {mounted && task.chartData && task.chartData.length > 0 && (
         <div className="mt-4 h-48 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={task.chartData}>
