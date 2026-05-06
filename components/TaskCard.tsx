@@ -20,7 +20,7 @@ interface TaskCardProps {
   onToggleStatus: (id: string) => void;
 }
 
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6"];
+const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#6d9f2dff"];
 
 export function TaskCard({ task, onToggleStatus }: TaskCardProps) {
   const isCompleted = task.status === "completed";
