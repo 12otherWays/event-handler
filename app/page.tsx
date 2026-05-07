@@ -1,9 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Plus, LayoutGrid, List, Settings, Search, Bell } from "lucide-react";
+import { useState } from "react";
+import { Plus, List, Settings, Search, Bell, CheckCircle2, Circle, MoreVertical } from "lucide-react";
 import { Task } from "@/lib/types";
-import { TaskCard } from "@/components/TaskCard";
 import { TaskForm } from "@/components/TaskForm";
 import { cn } from "@/lib/utils";
 
@@ -40,6 +39,8 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [newTaskTitle, setNewTaskTitle] = useState("");
+  const [newTaskDescription, setNewTaskDescription] = useState("");
 
   const addTask = (newTask: Omit<Task, "id" | "createdAt" | "status">) => {
     const task: Task = {
@@ -57,12 +58,28 @@ export default function Home() {
       tasks.map((t) =>
         t.id === id
           ? {
-              ...t,
-              status: t.status === "completed" ? "todo" : "completed",
-            }
+            ...t,
+            status: t.status === "completed" ? "todo" : "completed",
+          }
           : t
       )
     );
+  };
+
+  const handleInlineAdd = () => {
+    if (!newTaskTitle.trim()) return;
+    addTask({
+      title: newTaskTitle,
+      description: newTaskDescription,
+    });
+    setNewTaskTitle("");
+    setNewTaskDescription("");
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter") {
+      handleInlineAdd();
+    }
   };
 
   const filteredTasks = tasks.filter((t) =>
@@ -135,27 +152,114 @@ export default function Home() {
           </div>
         )}
 
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {filteredTasks.map((task) => (
-            <TaskCard
-              key={task.id}
-              task={task}
-              onToggleStatus={toggleTaskStatus}
-            />
-          ))}
-          {filteredTasks.length === 0 && (
-            <div className="col-span-full flex flex-col items-center justify-center py-20 text-center">
-              <div className="rounded-full bg-zinc-100 p-6 dark:bg-zinc-900">
-                <List className="h-10 w-10 text-zinc-400" />
-              </div>
-              <h3 className="mt-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                No tasks found
-              </h3>
-              <p className="mt-2 text-zinc-500">
-                Start by creating your first task with a rich description.
-              </p>
-            </div>
-          )}
+        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
+          <table className="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
+            <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+              <tr>
+                <th className="w-16 px-6 py-4 text-center font-medium text-zinc-500 dark:text-zinc-400">Status</th>
+                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Task Title</th>
+                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Description</th>
+                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Created At</th>
+                <th className="w-16 px-6 py-4 text-center font-medium text-zinc-500 dark:text-zinc-400">Actions</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+              {filteredTasks.map((task) => {
+                const isCompleted = task.status === "completed";
+                return (
+                  <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                    <td className="px-6 py-4 text-center">
+                      <button
+                        onClick={() => toggleTaskStatus(task.id)}
+                        className="mx-auto text-zinc-400 transition-colors hover:text-blue-500"
+                      >
+                        {isCompleted ? (
+                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
+                        ) : (
+                          <Circle className="h-5 w-5" />
+                        )}
+                      </button>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className={cn("font-medium", isCompleted ? "text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-50")}>
+                        {task.title}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400">
+                      <div className="max-w-md truncate">
+                        {task.description.replace(/\n/g, ' ')}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400">
+                      {new Date(task.createdAt).toLocaleDateString()}
+                    </td>
+                    <td className="px-6 py-4 text-center">
+                      <button className="mx-auto rounded-full p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                        <MoreVertical className="h-4 w-4 text-zinc-400" />
+                      </button>
+                    </td>
+                  </tr>
+                );
+              })}
+              
+              {/* Inline Add Row */}
+              <tr className="group transition-colors bg-blue-50/30 hover:bg-blue-50/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20">
+                <td className="px-6 py-4 text-center">
+                  <Plus className="h-5 w-5 mx-auto text-blue-400" />
+                </td>
+                <td className="px-6 py-4">
+                  <input
+                    type="text"
+                    placeholder="Type a task and press Enter..."
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full bg-transparent font-medium text-zinc-900 placeholder-zinc-400 focus:outline-none dark:text-zinc-50 dark:placeholder-zinc-600"
+                  />
+                </td>
+                <td className="px-6 py-4">
+                  <input
+                    type="text"
+                    placeholder="Add description..."
+                    value={newTaskDescription}
+                    onChange={(e) => setNewTaskDescription(e.target.value)}
+                    onKeyDown={handleKeyDown}
+                    className="w-full bg-transparent text-zinc-500 placeholder-zinc-400 focus:outline-none dark:text-zinc-400 dark:placeholder-zinc-600"
+                  />
+                </td>
+                <td className="px-6 py-4 text-zinc-400 dark:text-zinc-500 text-sm">
+                  Today
+                </td>
+                <td className="px-6 py-4 text-center">
+                  <button 
+                    onClick={handleInlineAdd}
+                    disabled={!newTaskTitle.trim()}
+                    className="mx-auto rounded-full p-1 text-blue-500 hover:bg-blue-100 disabled:opacity-50 dark:hover:bg-blue-900/30 transition-colors"
+                  >
+                    <CheckCircle2 className="h-5 w-5" />
+                  </button>
+                </td>
+              </tr>
+
+              {filteredTasks.length === 0 && (
+                <tr>
+                  <td colSpan={5} className="py-20 text-center">
+                    <div className="flex flex-col items-center justify-center">
+                      <div className="rounded-full bg-zinc-100 p-6 dark:bg-zinc-900">
+                        <List className="h-10 w-10 text-zinc-400" />
+                      </div>
+                      <h3 className="mt-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
+                        No tasks found
+                      </h3>
+                      <p className="mt-2 text-zinc-500">
+                        Start by creating your first task with a rich description.
+                      </p>
+                    </div>
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
       </main>
 
