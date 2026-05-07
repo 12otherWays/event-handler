@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, List, Settings, Search, Bell, CheckCircle2, Circle, MoreVertical } from "lucide-react";
+import { Plus, List, Settings, Search, Bell, CheckCircle2, Circle, MoreVertical, X } from "lucide-react";
+import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
 import { cn } from "@/lib/utils";
@@ -41,6 +42,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState("");
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
+  const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const addTask = (newTask: Omit<Task, "id" | "createdAt" | "status">) => {
     const task: Task = {
@@ -158,9 +160,6 @@ export default function Home() {
               <tr>
                 <th className="w-16 px-6 py-4 text-center font-medium text-zinc-500 dark:text-zinc-400">Status</th>
                 <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Task Title</th>
-                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Description</th>
-                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Created At</th>
-                <th className="w-16 px-6 py-4 text-center font-medium text-zinc-500 dark:text-zinc-400">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -180,23 +179,17 @@ export default function Home() {
                         )}
                       </button>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className={cn("font-medium", isCompleted ? "text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-50")}>
+                    <td className="px-6 py-4 relative group/cell">
+                      <span className={cn("font-medium pr-4", isCompleted ? "text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-50")}>
                         {task.title}
                       </span>
-                    </td>
-                    <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400">
-                      <div className="max-w-md truncate">
-                        {task.description.replace(/\n/g, ' ')}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 text-zinc-500 dark:text-zinc-400">
-                      {new Date(task.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4 text-center">
-                      <button className="mx-auto rounded-full p-1 hover:bg-zinc-100 dark:hover:bg-zinc-800">
-                        <MoreVertical className="h-4 w-4 text-zinc-400" />
-                      </button>
+                      {task.description && (
+                        <div 
+                          onClick={() => setSelectedTask(task)}
+                          className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-l-[12px] border-t-red-500 border-l-transparent cursor-pointer hover:border-t-red-600 transition-colors opacity-70 hover:opacity-100"
+                          title="View Description"
+                        />
+                      )}
                     </td>
                   </tr>
                 );
@@ -217,33 +210,11 @@ export default function Home() {
                     className="w-full bg-transparent font-medium text-zinc-900 placeholder-zinc-400 focus:outline-none dark:text-zinc-50 dark:placeholder-zinc-600"
                   />
                 </td>
-                <td className="px-6 py-4">
-                  <input
-                    type="text"
-                    placeholder="Add description..."
-                    value={newTaskDescription}
-                    onChange={(e) => setNewTaskDescription(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full bg-transparent text-zinc-500 placeholder-zinc-400 focus:outline-none dark:text-zinc-400 dark:placeholder-zinc-600"
-                  />
-                </td>
-                <td className="px-6 py-4 text-zinc-400 dark:text-zinc-500 text-sm">
-                  Today
-                </td>
-                <td className="px-6 py-4 text-center">
-                  <button 
-                    onClick={handleInlineAdd}
-                    disabled={!newTaskTitle.trim()}
-                    className="mx-auto rounded-full p-1 text-blue-500 hover:bg-blue-100 disabled:opacity-50 dark:hover:bg-blue-900/30 transition-colors"
-                  >
-                    <CheckCircle2 className="h-5 w-5" />
-                  </button>
-                </td>
               </tr>
 
               {filteredTasks.length === 0 && (
                 <tr>
-                  <td colSpan={5} className="py-20 text-center">
+                  <td colSpan={2} className="py-20 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="rounded-full bg-zinc-100 p-6 dark:bg-zinc-900">
                         <List className="h-10 w-10 text-zinc-400" />
@@ -266,6 +237,32 @@ export default function Home() {
       {/* Background Gradient Orbs */}
       <div className="fixed -left-20 -top-20 -z-10 h-80 w-80 rounded-full bg-blue-500/10 blur-[100px]" />
       <div className="fixed -bottom-20 -right-20 -z-10 h-80 w-80 rounded-full bg-purple-500/10 blur-[100px]" />
+
+      {/* Side Drawer */}
+      {selectedTask && (
+        <>
+          <div 
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity" 
+            onClick={() => setSelectedTask(null)} 
+          />
+          <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col animate-in slide-in-from-right duration-300">
+            <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
+              <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                {selectedTask.title}
+              </h2>
+              <button 
+                onClick={() => setSelectedTask(null)} 
+                className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="p-6 overflow-y-auto flex-1 prose prose-sm sm:prose-base prose-zinc dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-400">
+               <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
+            </div>
+          </div>
+        </>
+      )}
     </div>
   );
 }
