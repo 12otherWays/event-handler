@@ -36,6 +36,8 @@ const INITIAL_TASKS: Task[] = [
   },
 ];
 
+type ViewRange = "1" | "3" | "7" | "30";
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -43,6 +45,13 @@ export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [viewRange, setViewRange] = useState<ViewRange>("7");
+
+  const dateColumns = Array.from({ length: parseInt(viewRange) }).map((_, i) => {
+    const d = new Date();
+    d.setDate(d.getDate() + i);
+    return d;
+  });
 
   const addTask = (newTask: Omit<Task, "id" | "createdAt" | "status">) => {
     const task: Task = {
@@ -134,13 +143,25 @@ export default function Home() {
               Manage your tasks with rich data and visualization.
             </p>
           </div>
-          <button
-            onClick={() => setIsFormOpen(true)}
-            className="flex items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-8 py-4 font-bold text-white transition-all hover:bg-zinc-800 hover:shadow-xl active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200"
-          >
-            <Plus className="h-5 w-5" />
-            New Task
-          </button>
+          <div className="flex flex-col sm:flex-row items-center gap-4">
+            <select
+              value={viewRange}
+              onChange={(e) => setViewRange(e.target.value as ViewRange)}
+              className="rounded-2xl border border-zinc-200 bg-white px-4 py-4 text-sm font-medium text-zinc-900 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 cursor-pointer shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
+            >
+              <option value="1">1 Day</option>
+              <option value="3">3 Days</option>
+              <option value="7">Week</option>
+              <option value="30">Month</option>
+            </select>
+            <button
+              onClick={() => setIsFormOpen(true)}
+              className="flex items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-8 py-4 font-bold text-white transition-all hover:bg-zinc-800 hover:shadow-xl active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 w-full sm:w-auto"
+            >
+              <Plus className="h-5 w-5" />
+              New Task
+            </button>
+          </div>
         </div>
 
         {isFormOpen && (
@@ -158,8 +179,15 @@ export default function Home() {
           <table className="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
             <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
               <tr>
-                <th className="w-16 px-6 py-4 text-center font-medium text-zinc-500 dark:text-zinc-400">Status</th>
-                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400">Task Title</th>
+                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 min-w-[300px]">Task Title</th>
+                {dateColumns.map((date, i) => (
+                  <th key={i} className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 text-center border-l border-zinc-200 dark:border-zinc-800 min-w-[100px]">
+                    <div className="flex flex-col">
+                      <span className="text-xs uppercase tracking-wider">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                      <span className="text-zinc-900 dark:text-zinc-50 mt-1">{date.getDate()}</span>
+                    </div>
+                  </th>
+                ))}
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -167,54 +195,30 @@ export default function Home() {
                 const isCompleted = task.status === "completed";
                 return (
                   <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-                    <td className="px-6 py-4 text-center">
-                      <button
-                        onClick={() => toggleTaskStatus(task.id)}
-                        className="mx-auto text-zinc-400 transition-colors hover:text-blue-500"
-                      >
-                        {isCompleted ? (
-                          <CheckCircle2 className="h-5 w-5 text-emerald-500" />
-                        ) : (
-                          <Circle className="h-5 w-5" />
-                        )}
-                      </button>
-                    </td>
                     <td className="px-6 py-4 relative group/cell">
                       <span className={cn("font-medium pr-4", isCompleted ? "text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-50")}>
                         {task.title}
                       </span>
                       {task.description && (
-                        <div 
+                        <div
                           onClick={() => setSelectedTask(task)}
                           className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-l-[12px] border-t-red-500 border-l-transparent cursor-pointer hover:border-t-red-600 transition-colors opacity-70 hover:opacity-100"
                           title="View Description"
                         />
                       )}
                     </td>
+                    {dateColumns.map((_, i) => (
+                      <td key={i} className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
+                        {/* Empty interactive cell */}
+                      </td>
+                    ))}
                   </tr>
                 );
               })}
-              
-              {/* Inline Add Row */}
-              <tr className="group transition-colors bg-blue-50/30 hover:bg-blue-50/50 dark:bg-blue-900/10 dark:hover:bg-blue-900/20">
-                <td className="px-6 py-4 text-center">
-                  <Plus className="h-5 w-5 mx-auto text-blue-400" />
-                </td>
-                <td className="px-6 py-4">
-                  <input
-                    type="text"
-                    placeholder="Type a task and press Enter..."
-                    value={newTaskTitle}
-                    onChange={(e) => setNewTaskTitle(e.target.value)}
-                    onKeyDown={handleKeyDown}
-                    className="w-full bg-transparent font-medium text-zinc-900 placeholder-zinc-400 focus:outline-none dark:text-zinc-50 dark:placeholder-zinc-600"
-                  />
-                </td>
-              </tr>
 
               {filteredTasks.length === 0 && (
                 <tr>
-                  <td colSpan={2} className="py-20 text-center">
+                  <td colSpan={1 + dateColumns.length} className="py-20 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <div className="rounded-full bg-zinc-100 p-6 dark:bg-zinc-900">
                         <List className="h-10 w-10 text-zinc-400" />
@@ -241,24 +245,24 @@ export default function Home() {
       {/* Side Drawer */}
       {selectedTask && (
         <>
-          <div 
-            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity" 
-            onClick={() => setSelectedTask(null)} 
+          <div
+            className="fixed inset-0 z-40 bg-black/20 backdrop-blur-sm transition-opacity"
+            onClick={() => setSelectedTask(null)}
           />
           <div className="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white shadow-2xl dark:bg-zinc-950 border-l border-zinc-200 dark:border-zinc-800 flex flex-col animate-in slide-in-from-right duration-300">
             <div className="flex items-center justify-between p-6 border-b border-zinc-200 dark:border-zinc-800">
               <h2 className="text-xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
                 {selectedTask.title}
               </h2>
-              <button 
-                onClick={() => setSelectedTask(null)} 
+              <button
+                onClick={() => setSelectedTask(null)}
                 className="rounded-full p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
               >
                 <X className="h-5 w-5" />
               </button>
             </div>
             <div className="p-6 overflow-y-auto flex-1 prose prose-sm sm:prose-base prose-zinc dark:prose-invert max-w-none text-zinc-600 dark:text-zinc-400">
-               <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
+              <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
             </div>
           </div>
         </>
