@@ -84,16 +84,6 @@ export default function Home() {
     setNewTaskDescription("");
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "Enter") {
-      handleInlineAdd();
-    }
-  };
-
-  const filteredTasks = tasks.filter((t) =>
-    t.title.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-black">
       {/* Navigation */}
@@ -103,29 +93,6 @@ export default function Home() {
             <h1 className="text-xl font-bold tracking-tighter text-blue-600 dark:text-blue-500">
               EVENT HANDLER
             </h1>
-            <nav className="hidden items-center gap-6 md:flex">
-              <a href="#" className="text-sm font-medium text-zinc-900 dark:text-zinc-50">Dashboard</a>
-              <a href="#" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">Tasks</a>
-              <a href="#" className="text-sm font-medium text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-50">Projects</a>
-            </nav>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="relative hidden sm:block">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-              <input
-                type="text"
-                placeholder="Search tasks..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-64 rounded-full border border-zinc-200 bg-zinc-50 py-2 pl-10 pr-4 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-800 dark:bg-zinc-900"
-              />
-            </div>
-            <button className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900">
-              <Bell className="h-5 w-5" />
-            </button>
-            <button className="rounded-full p-2 text-zinc-500 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-900">
-              <Settings className="h-5 w-5" />
-            </button>
           </div>
         </div>
       </header>
@@ -136,9 +103,6 @@ export default function Home() {
             <h2 className="text-4xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-50">
               My Workspace
             </h2>
-            <p className="mt-2 text-lg text-zinc-600 dark:text-zinc-400">
-              Manage your tasks with rich data and visualization.
-            </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <button
@@ -178,7 +142,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {filteredTasks.map((task) => {
+              {tasks.map((task) => {
                 const isCompleted = task.status === "completed";
                 return (
                   <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
@@ -202,24 +166,6 @@ export default function Home() {
                   </tr>
                 );
               })}
-
-              {filteredTasks.length === 0 && (
-                <tr>
-                  <td colSpan={1 + dateColumns.length} className="py-20 text-center">
-                    <div className="flex flex-col items-center justify-center">
-                      <div className="rounded-full bg-zinc-100 p-6 dark:bg-zinc-900">
-                        <List className="h-10 w-10 text-zinc-400" />
-                      </div>
-                      <h3 className="mt-4 text-xl font-semibold text-zinc-900 dark:text-zinc-50">
-                        No tasks found
-                      </h3>
-                      <p className="mt-2 text-zinc-500">
-                        Start by creating your first task with a rich description.
-                      </p>
-                    </div>
-                  </td>
-                </tr>
-              )}
             </tbody>
           </table>
         </div>
