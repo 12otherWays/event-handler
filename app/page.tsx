@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, List, Settings, Search, Bell, CheckCircle2, Circle, MoreVertical, X } from "lucide-react";
+import { Plus, List, Settings, Search, Bell, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
@@ -36,8 +36,6 @@ const INITIAL_TASKS: Task[] = [
   },
 ];
 
-type ViewRange = "1" | "3" | "7" | "30";
-
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -45,9 +43,8 @@ export default function Home() {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [newTaskDescription, setNewTaskDescription] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [viewRange, setViewRange] = useState<ViewRange>("7");
 
-  const dateColumns = Array.from({ length: parseInt(viewRange) }).map((_, i) => {
+  const dateColumns = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date();
     d.setDate(d.getDate() + i);
     return d;
@@ -144,16 +141,6 @@ export default function Home() {
             </p>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
-            <select
-              value={viewRange}
-              onChange={(e) => setViewRange(e.target.value as ViewRange)}
-              className="rounded-2xl border border-zinc-200 bg-white px-4 py-4 text-sm font-medium text-zinc-900 focus:outline-none dark:border-zinc-800 dark:bg-zinc-950 dark:text-zinc-50 cursor-pointer shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors"
-            >
-              <option value="1">1 Day</option>
-              <option value="3">3 Days</option>
-              <option value="7">Week</option>
-              <option value="30">Month</option>
-            </select>
             <button
               onClick={() => setIsFormOpen(true)}
               className="flex items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-8 py-4 font-bold text-white transition-all hover:bg-zinc-800 hover:shadow-xl active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 w-full sm:w-auto"
