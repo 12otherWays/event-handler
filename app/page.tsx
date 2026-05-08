@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, List, Settings, Search, Bell, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
@@ -39,9 +39,6 @@ const INITIAL_TASKS: Task[] = [
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState("");
-  const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [newTaskDescription, setNewTaskDescription] = useState("");
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
@@ -59,29 +56,6 @@ export default function Home() {
     };
     setTasks([task, ...tasks]);
     setIsFormOpen(false);
-  };
-
-  const toggleTaskStatus = (id: string) => {
-    setTasks(
-      tasks.map((t) =>
-        t.id === id
-          ? {
-            ...t,
-            status: t.status === "completed" ? "todo" : "completed",
-          }
-          : t
-      )
-    );
-  };
-
-  const handleInlineAdd = () => {
-    if (!newTaskTitle.trim()) return;
-    addTask({
-      title: newTaskTitle,
-      description: newTaskDescription,
-    });
-    setNewTaskTitle("");
-    setNewTaskDescription("");
   };
 
   return (
