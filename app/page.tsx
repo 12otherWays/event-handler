@@ -156,11 +156,11 @@ export default function Home() {
                         >
                           <div className="flex items-center justify-center min-h-[1.5rem]">
                             {isMarked ? (
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
-                                <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/45">
+                                <Check className="h-4 w-4 text-emerald-600" />
                               </div>
                             ) : (
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 opacity-0 group-hover:opacity-100 dark:border-zinc-800 transition-opacity">
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 opacity-0 opacity-100 dark:border-zinc-600 transition-opacity">
                                 <Check className="h-3 w-3 text-zinc-300" />
                               </div>
                             )}
