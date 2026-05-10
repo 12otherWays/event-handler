@@ -9,6 +9,7 @@ export interface Task {
   description: string; // Markdown supported
   chartData?: ChartDataPoint[];
   status: 'todo' | 'in-progress' | 'completed';
+  completedDates?: string[]; // Array of ISO date strings (Y-m-d)
   createdAt: number;
   metadata?: Record<string, any>; // For future extensibility
 }

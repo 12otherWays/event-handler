@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X } from "lucide-react";
+import { Plus, X, Check } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
@@ -56,6 +56,20 @@ export default function Home() {
     };
     setTasks([task, ...tasks]);
     setIsFormOpen(false);
+  };
+
+  const toggleTaskDate = (taskId: string, date: Date) => {
+    const dateStr = date.toISOString().split('T')[0];
+    setTasks(
+      tasks.map((t) => {
+        if (t.id !== taskId) return t;
+        const currentDates = t.completedDates || [];
+        const newDates = currentDates.includes(dateStr)
+          ? currentDates.filter((d) => d !== dateStr)
+          : [...currentDates, dateStr];
+        return { ...t, completedDates: newDates };
+      })
+    );
   };
 
   return (
@@ -121,7 +135,7 @@ export default function Home() {
                 return (
                   <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
                     <td className="px-6 py-4 relative group/cell">
-                      <span className={cn("font-medium pr-4", isCompleted ? "text-zinc-400 line-through" : "text-zinc-900 dark:text-zinc-50")}>
+                      <span className="font-medium pr-4 text-zinc-900 dark:text-zinc-50">
                         {task.title}
                       </span>
                       {task.description && (
@@ -132,11 +146,29 @@ export default function Home() {
                         />
                       )}
                     </td>
-                    {dateColumns.map((_, i) => (
-                      <td key={i} className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer">
-                        {/* Empty interactive cell */}
-                      </td>
-                    ))}
+                    {dateColumns.map((date, i) => {
+                      const dateStr = date.toISOString().split('T')[0];
+                      const isMarked = task.completedDates?.includes(dateStr);
+                      return (
+                        <td
+                          key={i}
+                          onClick={() => toggleTaskDate(task.id, date)}
+                          className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                        >
+                          <div className="flex items-center justify-center min-h-[1.5rem]">
+                            {isMarked ? (
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/30">
+                                <Check className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                              </div>
+                            ) : (
+                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 opacity-0 group-hover:opacity-100 dark:border-zinc-800 transition-opacity">
+                                <Check className="h-3 w-3 text-zinc-300" />
+                              </div>
+                            )}
+                          </div>
+                        </td>
+                      );
+                    })}
                   </tr>
                 );
               })}
