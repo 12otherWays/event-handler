@@ -131,7 +131,6 @@ export default function Home() {
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
               {tasks.map((task) => {
-                const isCompleted = task.status === "completed";
                 return (
                   <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
                     <td className="px-6 py-4 relative group/cell">
