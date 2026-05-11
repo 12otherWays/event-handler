@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Plus, X, Check, Menu } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
@@ -13,6 +13,21 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [sheets, setSheets] = useState(["Sheet1"]);
   const [activeSheet, setActiveSheet] = useState("Sheet1");
+
+  useEffect(() => {
+    const savedTasks = localStorage.getItem("event-handler-tasks");
+    if (savedTasks) {
+      try {
+        setTasks(JSON.parse(savedTasks));
+      } catch (e) {
+        console.error("Failed to parse tasks from localStorage");
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("event-handler-tasks", JSON.stringify(tasks));
+  }, [tasks]);
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date();
