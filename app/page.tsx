@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, X, Check } from "lucide-react";
+import { Plus, X, Check, Menu } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
@@ -11,6 +11,8 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [sheets, setSheets] = useState(["Sheet1"]);
+  const [activeSheet, setActiveSheet] = useState("Sheet1");
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date();
@@ -85,8 +87,9 @@ export default function Home() {
           </div>
         )}
 
-        <div className="overflow-x-auto rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50">
-          <table className="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
+        <div className="flex flex-col rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50 overflow-hidden">
+          <div className="overflow-x-auto">
+            <table className="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
             <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
               <tr>
                 <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 min-w-[300px]">Task Title</th>
@@ -143,7 +146,49 @@ export default function Home() {
                 );
               })}
             </tbody>
-          </table>
+            </table>
+          </div>
+
+          {/* Sheets Tabs */}
+          <div className="flex items-center bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 shrink-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
+            <div className="flex items-center gap-1 px-2 py-1 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky left-0 bg-zinc-50 dark:bg-zinc-900 z-10">
+              <button 
+                onClick={() => {
+                  const newSheetName = `Sheet${sheets.length + 1}`;
+                  setSheets([...sheets, newSheetName]);
+                  setActiveSheet(newSheetName);
+                }}
+                className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md text-zinc-500 dark:text-zinc-400 transition-colors"
+                title="Add Sheet"
+              >
+                <Plus className="h-4 w-4" />
+              </button>
+              <button 
+                className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md text-zinc-500 dark:text-zinc-400 transition-colors"
+                title="All sheets"
+              >
+                <Menu className="h-4 w-4" />
+              </button>
+            </div>
+            <div className="flex items-center flex-1">
+              {sheets.map(sheet => (
+                <button
+                  key={sheet}
+                  onClick={() => setActiveSheet(sheet)}
+                  className={`relative px-4 py-2 text-sm font-medium border-r border-zinc-200 dark:border-zinc-800 min-w-[120px] max-w-[200px] text-left transition-colors group flex-shrink-0 ${
+                    activeSheet === sheet 
+                      ? "bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-500" 
+                      : "bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
+                  }`}
+                >
+                  <span className="truncate block">{sheet}</span>
+                  {activeSheet === sheet && (
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-600 dark:bg-blue-500" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </div>
       </main>
 
