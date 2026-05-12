@@ -123,69 +123,69 @@ export default function Home() {
         <div className="flex flex-col rounded-xl border border-zinc-200 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-950/50 overflow-hidden">
           <div className="overflow-x-auto">
             <table className="w-full min-w-[800px] text-left text-sm whitespace-nowrap">
-            <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
-              <tr>
-                <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 min-w-[300px]">Task Title</th>
-                {dateColumns.map((date, i) => (
-                  <th key={i} className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 text-center border-l border-zinc-200 dark:border-zinc-800 min-w-[100px]">
-                    <div className="flex flex-col">
-                      <span className="text-xs uppercase tracking-wider">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                      <span className="text-zinc-900 dark:text-zinc-50 mt-1">{date.getDate()}</span>
-                    </div>
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {tasks.filter(t => t.sheetId === activeSheetId || (!t.sheetId && activeSheetId === sheets[0]?.id)).map((task) => {
-                return (
-                  <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
-                    <td className="px-6 py-4 relative group/cell">
-                      <span className="font-medium pr-4 text-zinc-900 dark:text-zinc-50">
-                        {task.title}
-                      </span>
-                      {task.description && (
-                        <div
-                          onClick={() => setSelectedTask(task)}
-                          className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-l-[12px] border-t-red-500 border-l-transparent cursor-pointer hover:border-t-red-600 transition-colors opacity-70 hover:opacity-100"
-                          title="View Description"
-                        />
-                      )}
-                    </td>
-                    {dateColumns.map((date, i) => {
-                      const dateStr = date.toISOString().split('T')[0];
-                      const isMarked = task.completedDates?.includes(dateStr);
-                      return (
-                        <td
-                          key={i}
-                          onClick={() => toggleTaskDate(task.id, date)}
-                          className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
-                        >
-                          <div className="flex items-center justify-center min-h-[1.5rem]">
-                            {isMarked ? (
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/45">
-                                <Check className="h-4 w-4 text-emerald-600" />
-                              </div>
-                            ) : (
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 opacity-0 opacity-100 dark:border-zinc-600 transition-opacity">
-                                <Check className="h-3 w-3 text-zinc-300" />
-                              </div>
-                            )}
-                          </div>
-                        </td>
-                      );
-                    })}
-                  </tr>
-                );
-              })}
-            </tbody>
+              <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
+                <tr>
+                  <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 min-w-[300px]">Task Title</th>
+                  {dateColumns.map((date, i) => (
+                    <th key={i} className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 text-center border-l border-zinc-200 dark:border-zinc-800 min-w-[100px]">
+                      <div className="flex flex-col">
+                        <span className="text-xs uppercase tracking-wider">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
+                        <span className="text-zinc-900 dark:text-zinc-50 mt-1">{date.getDate()}</span>
+                      </div>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
+                {tasks.filter(t => t.sheetId === activeSheetId || (!t.sheetId && activeSheetId === sheets[0]?.id)).map((task) => {
+                  return (
+                    <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
+                      <td className="px-6 py-4 relative group/cell">
+                        <span className="font-medium pr-4 text-zinc-900 dark:text-zinc-50">
+                          {task.title}
+                        </span>
+                        {task.description && (
+                          <div
+                            onClick={() => setSelectedTask(task)}
+                            className="absolute top-0 right-0 w-0 h-0 border-t-[12px] border-l-[12px] border-t-red-500 border-l-transparent cursor-pointer hover:border-t-red-600 transition-colors opacity-70 hover:opacity-100"
+                            title="View Description"
+                          />
+                        )}
+                      </td>
+                      {dateColumns.map((date, i) => {
+                        const dateStr = date.toISOString().split('T')[0];
+                        const isMarked = task.completedDates?.includes(dateStr);
+                        return (
+                          <td
+                            key={i}
+                            onClick={() => toggleTaskDate(task.id, date)}
+                            className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                          >
+                            <div className="flex items-center justify-center min-h-[1.5rem]">
+                              {isMarked ? (
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-emerald-100 dark:bg-emerald-900/45">
+                                  <Check className="h-4 w-4 text-emerald-600" />
+                                </div>
+                              ) : (
+                                <div className="flex h-6 w-6 items-center justify-center rounded-full border border-zinc-200 opacity-0 opacity-100 dark:border-zinc-600 transition-opacity">
+                                  <Check className="h-3 w-3 text-zinc-300" />
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                        );
+                      })}
+                    </tr>
+                  );
+                })}
+              </tbody>
             </table>
           </div>
 
           {/* Sheets Tabs */}
           <div className="flex items-center bg-zinc-50 dark:bg-zinc-900 border-t border-zinc-200 dark:border-zinc-800 shrink-0 overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:'none'] [scrollbar-width:'none']">
             <div className="flex items-center gap-1 px-2 py-1 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky left-0 bg-zinc-50 dark:bg-zinc-900 z-10">
-              <button 
+              <button
                 onClick={() => {
                   const newSheet: Sheet = {
                     id: Math.random().toString(36).substring(2, 9),
@@ -199,7 +199,7 @@ export default function Home() {
               >
                 <Plus className="h-4 w-4" />
               </button>
-              <button 
+              <button
                 className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md text-zinc-500 dark:text-zinc-400 transition-colors"
                 title="All sheets"
               >
@@ -211,31 +211,31 @@ export default function Home() {
                 const sheetColor = sheet.color || '#3b82f6';
                 const isActive = activeSheetId === sheet.id;
                 return (
-                <button
-                  key={sheet.id}
-                  onClick={() => setActiveSheetId(sheet.id)}
-                  className={`relative px-4 py-2 text-sm font-medium border-r border-zinc-200 dark:border-zinc-800 min-w-[120px] max-w-[200px] text-left transition-colors group flex-shrink-0 flex items-center justify-between ${
-                    isActive 
-                      ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50" 
+                  <button
+                    key={sheet.id}
+                    onClick={() => setActiveSheetId(sheet.id)}
+                    className={`relative px-4 py-2 text-sm font-medium border-r border-zinc-200 dark:border-zinc-800 min-w-[120px] max-w-[200px] text-left transition-colors group flex-shrink-0 flex items-center justify-between ${isActive
+                      ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50"
                       : "bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
-                  }`}
-                  style={isActive ? { color: sheetColor } : {}}
-                >
-                  <span className="truncate block pr-4">{sheet.name}</span>
-                  
-                  <div 
-                    onClick={(e) => { e.stopPropagation(); setEditingSheet(sheet); }}
-                    className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity"
-                    title="Edit Sheet"
+                      }`}
+                    style={isActive ? { color: sheetColor } : {}}
                   >
-                    <MoreVertical className="h-3 w-3 text-zinc-500" />
-                  </div>
+                    <span className="truncate block pr-4">{sheet.name}</span>
 
-                  {isActive && (
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: sheetColor }} />
-                  )}
-                </button>
-              )})}
+                    <div
+                      onClick={(e) => { e.stopPropagation(); setEditingSheet(sheet); }}
+                      className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                      title="Edit Sheet"
+                    >
+                      <MoreVertical className="h-3 w-3 text-zinc-500" />
+                    </div>
+
+                    {isActive && (
+                      <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: sheetColor }} />
+                    )}
+                  </button>
+                )
+              })}
             </div>
           </div>
         </div>
@@ -278,20 +278,20 @@ export default function Home() {
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   value={editingSheet.name}
-                  onChange={(e) => setEditingSheet({...editingSheet, name: e.target.value})}
+                  onChange={(e) => setEditingSheet({ ...editingSheet, name: e.target.value })}
                   className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-700 text-zinc-900 dark:text-zinc-50"
                 />
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Color</label>
                 <div className="flex items-center gap-3">
-                   <input 
-                    type="color" 
+                  <input
+                    type="color"
                     value={editingSheet.color || '#3b82f6'}
-                    onChange={(e) => setEditingSheet({...editingSheet, color: e.target.value})}
+                    onChange={(e) => setEditingSheet({ ...editingSheet, color: e.target.value })}
                     className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
                   />
                   <span className="text-sm text-zinc-500">{editingSheet.color || '#3b82f6'}</span>
@@ -319,13 +319,13 @@ export default function Home() {
                 <div />
               )}
               <div className="flex gap-3">
-                <button 
+                <button
                   onClick={() => setEditingSheet(null)}
                   className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
                 >
                   Cancel
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setSheets(sheets.map(s => s.id === editingSheet.id ? editingSheet : s));
                     setEditingSheet(null);
