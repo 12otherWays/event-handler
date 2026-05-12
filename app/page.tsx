@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, X, Check, Menu, MoreVertical } from "lucide-react";
+import { Plus, X, Check, Menu, MoreVertical, Trash2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task, Sheet } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
@@ -310,8 +310,9 @@ export default function Home() {
                     setTasks(tasks.filter(t => t.sheetId !== editingSheet.id));
                     setEditingSheet(null);
                   }}
-                  className="rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-950/30 transition-colors"
+                  className="flex items-center gap-2 rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-950/30 transition-colors"
                 >
+                  <Trash2 className="h-4 w-4" />
                   Delete Sheet
                 </button>
               ) : (
