@@ -6,7 +6,7 @@ import { Task, ChartDataPoint } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 interface TaskFormProps {
-  onSubmit: (task: Omit<Task, "id" | "createdAt" | "status">) => void;
+  onSubmit: (task: Omit<Task, "id" | "createdAt" | "status" | "sheetId">) => void;
   onCancel: () => void;
 }
 

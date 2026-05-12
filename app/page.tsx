@@ -52,12 +52,13 @@ export default function Home() {
     return d;
   });
 
-  const addTask = (newTask: Omit<Task, "id" | "createdAt" | "status">) => {
+  const addTask = (newTask: Omit<Task, "id" | "createdAt" | "status" | "sheetId">) => {
     const task: Task = {
       ...newTask,
       id: Math.random().toString(36).substring(2, 9),
       createdAt: Date.now(),
       status: "todo",
+      sheetId: activeSheetId,
     };
     setTasks([task, ...tasks]);
     setIsFormOpen(false);
@@ -136,7 +137,7 @@ export default function Home() {
               </tr>
             </thead>
             <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
-              {tasks.map((task) => {
+              {tasks.filter(t => t.sheetId === activeSheetId || (!t.sheetId && activeSheetId === sheets[0]?.id)).map((task) => {
                 return (
                   <tr key={task.id} className="group transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-900/50">
                     <td className="px-6 py-4 relative group/cell">

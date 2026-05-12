@@ -11,6 +11,7 @@ export interface Task {
   status: 'todo' | 'in-progress' | 'completed';
   completedDates?: string[]; // Array of ISO date strings (Y-m-d)
   createdAt: number;
+  sheetId?: string;
   metadata?: Record<string, any>; // For future extensibility
 }
 
