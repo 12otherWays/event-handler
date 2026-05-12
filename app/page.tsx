@@ -1,9 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, X, Check, Menu } from "lucide-react";
+import { Plus, X, Check, Menu, MoreVertical } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import { Task } from "@/lib/types";
+import { Task, Sheet } from "@/lib/types";
 import { TaskForm } from "@/components/TaskForm";
 import { INITIAL_TASKS } from "@/lib/constants";
 
@@ -11,16 +11,29 @@ export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(INITIAL_TASKS);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [sheets, setSheets] = useState(["Sheet1"]);
-  const [activeSheet, setActiveSheet] = useState("Sheet1");
+  const [sheets, setSheets] = useState<Sheet[]>([{ id: "sheet-1", name: "Sheet1" }]);
+  const [activeSheetId, setActiveSheetId] = useState("sheet-1");
+  const [editingSheet, setEditingSheet] = useState<Sheet | null>(null);
 
   useEffect(() => {
     const savedTasks = localStorage.getItem("event-handler-tasks");
     if (savedTasks) {
       try {
         setTasks(JSON.parse(savedTasks));
-      } catch (e) {
+      } catch {
         console.error("Failed to parse tasks from localStorage");
+      }
+    }
+    const savedSheets = localStorage.getItem("event-handler-sheets");
+    if (savedSheets) {
+      try {
+        const parsed = JSON.parse(savedSheets);
+        if (parsed && parsed.length > 0) {
+          setSheets(parsed);
+          setActiveSheetId(parsed[0].id);
+        }
+      } catch {
+        console.error("Failed to parse sheets from localStorage");
       }
     }
   }, []);
@@ -28,6 +41,10 @@ export default function Home() {
   useEffect(() => {
     localStorage.setItem("event-handler-tasks", JSON.stringify(tasks));
   }, [tasks]);
+
+  useEffect(() => {
+    localStorage.setItem("event-handler-sheets", JSON.stringify(sheets));
+  }, [sheets]);
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date();
@@ -169,9 +186,12 @@ export default function Home() {
             <div className="flex items-center gap-1 px-2 py-1 border-r border-zinc-200 dark:border-zinc-800 shrink-0 sticky left-0 bg-zinc-50 dark:bg-zinc-900 z-10">
               <button 
                 onClick={() => {
-                  const newSheetName = `Sheet${sheets.length + 1}`;
-                  setSheets([...sheets, newSheetName]);
-                  setActiveSheet(newSheetName);
+                  const newSheet: Sheet = {
+                    id: Math.random().toString(36).substring(2, 9),
+                    name: `Sheet ${sheets.length + 1}`
+                  };
+                  setSheets([...sheets, newSheet]);
+                  setActiveSheetId(newSheet.id);
                 }}
                 className="p-1.5 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-md text-zinc-500 dark:text-zinc-400 transition-colors"
                 title="Add Sheet"
@@ -186,22 +206,35 @@ export default function Home() {
               </button>
             </div>
             <div className="flex items-center flex-1">
-              {sheets.map(sheet => (
+              {sheets.map(sheet => {
+                const sheetColor = sheet.color || '#3b82f6';
+                const isActive = activeSheetId === sheet.id;
+                return (
                 <button
-                  key={sheet}
-                  onClick={() => setActiveSheet(sheet)}
-                  className={`relative px-4 py-2 text-sm font-medium border-r border-zinc-200 dark:border-zinc-800 min-w-[120px] max-w-[200px] text-left transition-colors group flex-shrink-0 ${
-                    activeSheet === sheet 
-                      ? "bg-white dark:bg-zinc-950 text-blue-600 dark:text-blue-500" 
+                  key={sheet.id}
+                  onClick={() => setActiveSheetId(sheet.id)}
+                  className={`relative px-4 py-2 text-sm font-medium border-r border-zinc-200 dark:border-zinc-800 min-w-[120px] max-w-[200px] text-left transition-colors group flex-shrink-0 flex items-center justify-between ${
+                    isActive 
+                      ? "bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50" 
                       : "bg-transparent text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800/50"
                   }`}
+                  style={isActive ? { color: sheetColor } : {}}
                 >
-                  <span className="truncate block">{sheet}</span>
-                  {activeSheet === sheet && (
-                    <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-blue-600 dark:bg-blue-500" />
+                  <span className="truncate block pr-4">{sheet.name}</span>
+                  
+                  <div 
+                    onClick={(e) => { e.stopPropagation(); setEditingSheet(sheet); }}
+                    className="p-1 rounded hover:bg-zinc-200 dark:hover:bg-zinc-700 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Edit Sheet"
+                  >
+                    <MoreVertical className="h-3 w-3 text-zinc-500" />
+                  </div>
+
+                  {isActive && (
+                    <div className="absolute bottom-0 left-0 right-0 h-[2px]" style={{ backgroundColor: sheetColor }} />
                   )}
                 </button>
-              ))}
+              )})}
             </div>
           </div>
         </div>
@@ -235,6 +268,54 @@ export default function Home() {
             </div>
           </div>
         </>
+      )}
+
+      {editingSheet && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-6 backdrop-blur-sm">
+          <div className="w-full max-w-sm rounded-2xl bg-white p-6 shadow-xl dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 animate-in fade-in zoom-in duration-200">
+            <h3 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-zinc-50">Edit Sheet</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Name</label>
+                <input 
+                  type="text" 
+                  value={editingSheet.name}
+                  onChange={(e) => setEditingSheet({...editingSheet, name: e.target.value})}
+                  className="w-full rounded-lg border border-zinc-300 bg-transparent px-3 py-2 text-sm focus:border-blue-500 focus:outline-none dark:border-zinc-700 text-zinc-900 dark:text-zinc-50"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">Color</label>
+                <div className="flex items-center gap-3">
+                   <input 
+                    type="color" 
+                    value={editingSheet.color || '#3b82f6'}
+                    onChange={(e) => setEditingSheet({...editingSheet, color: e.target.value})}
+                    className="h-8 w-8 cursor-pointer rounded border-0 bg-transparent p-0"
+                  />
+                  <span className="text-sm text-zinc-500">{editingSheet.color || '#3b82f6'}</span>
+                </div>
+              </div>
+            </div>
+            <div className="mt-6 flex justify-end gap-3">
+              <button 
+                onClick={() => setEditingSheet(null)}
+                className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button 
+                onClick={() => {
+                  setSheets(sheets.map(s => s.id === editingSheet.id ? editingSheet : s));
+                  setEditingSheet(null);
+                }}
+                className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors"
+              >
+                Save
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </div>
   );

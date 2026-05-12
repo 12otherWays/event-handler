@@ -13,3 +13,9 @@ export interface Task {
   createdAt: number;
   metadata?: Record<string, any>; // For future extensibility
 }
+
+export interface Sheet {
+  id: string;
+  name: string;
+  color?: string;
+}
