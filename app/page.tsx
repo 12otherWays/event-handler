@@ -298,22 +298,42 @@ export default function Home() {
                 </div>
               </div>
             </div>
-            <div className="mt-6 flex justify-end gap-3">
-              <button 
-                onClick={() => setEditingSheet(null)}
-                className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
-              >
-                Cancel
-              </button>
-              <button 
-                onClick={() => {
-                  setSheets(sheets.map(s => s.id === editingSheet.id ? editingSheet : s));
-                  setEditingSheet(null);
-                }}
-                className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors"
-              >
-                Save
-              </button>
+            <div className="mt-6 flex items-center justify-between">
+              {sheets.length > 1 ? (
+                <button
+                  onClick={() => {
+                    const remainingSheets = sheets.filter(s => s.id !== editingSheet.id);
+                    setSheets(remainingSheets);
+                    if (activeSheetId === editingSheet.id) {
+                      setActiveSheetId(remainingSheets[0].id);
+                    }
+                    setTasks(tasks.filter(t => t.sheetId !== editingSheet.id));
+                    setEditingSheet(null);
+                  }}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-500 dark:hover:bg-red-950/30 transition-colors"
+                >
+                  Delete Sheet
+                </button>
+              ) : (
+                <div />
+              )}
+              <div className="flex gap-3">
+                <button 
+                  onClick={() => setEditingSheet(null)}
+                  className="rounded-lg px-4 py-2 text-sm font-medium text-zinc-600 hover:bg-zinc-100 dark:text-zinc-400 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button 
+                  onClick={() => {
+                    setSheets(sheets.map(s => s.id === editingSheet.id ? editingSheet : s));
+                    setEditingSheet(null);
+                  }}
+                  className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 transition-colors"
+                >
+                  Save
+                </button>
+              </div>
             </div>
           </div>
         </div>
