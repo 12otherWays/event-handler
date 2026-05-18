@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, X, Check, Menu, MoreVertical, Trash2 } from "lucide-react";
+import { Plus, X, Check, Menu, MoreVertical, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
 import { Tab, TabData } from "@/classes/Tab";
@@ -17,6 +17,33 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   // editingTab stores a plain copy of the tab being edited so inputs are controlled
   const [editingTabData, setEditingTabData] = useState<TabData | null>(null);
+
+  const [startDate, setStartDate] = useState<Date>(() => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7); // Default to starting 7 days ago so past data is visible
+    return d;
+  });
+
+  const adjustStartDate = (days: number) => {
+    setStartDate((prev) => {
+      const next = new Date(prev);
+      next.setDate(next.getDate() + days);
+      return next;
+    });
+  };
+
+  const resetToDefaultDate = () => {
+    const d = new Date();
+    d.setDate(d.getDate() - 7);
+    setStartDate(d);
+  };
+
+  const isToday = (date: Date) => {
+    const today = new Date();
+    return date.getDate() === today.getDate() &&
+      date.getMonth() === today.getMonth() &&
+      date.getFullYear() === today.getFullYear();
+  };
 
   useEffect(() => {
     const savedTasks = localStorage.getItem("event-handler-tasks");
@@ -51,7 +78,7 @@ export default function Home() {
   }, [tabs]);
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
-    const d = new Date();
+    const d = new Date(startDate);
     d.setDate(d.getDate() + i);
     return d;
   });
@@ -103,6 +130,30 @@ export default function Home() {
             </h2>
           </div>
           <div className="flex flex-col sm:flex-row items-center gap-4">
+            {/* Date Navigation Controls */}
+            <div className="flex items-center gap-1 rounded-xl border border-zinc-200 bg-white p-1 dark:border-zinc-800 dark:bg-zinc-950/50">
+              <button
+                onClick={() => adjustStartDate(-7)}
+                className="rounded-lg p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-850 text-zinc-500 dark:text-zinc-400 transition-colors"
+                title="Previous Week"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={resetToDefaultDate}
+                className="rounded-lg px-3 py-1 text-xs font-bold text-zinc-700 bg-zinc-100 hover:bg-zinc-200 dark:text-zinc-300 dark:bg-zinc-800 dark:hover:bg-zinc-750 transition-colors"
+              >
+                Today
+              </button>
+              <button
+                onClick={() => adjustStartDate(7)}
+                className="rounded-lg p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-850 text-zinc-500 dark:text-zinc-400 transition-colors"
+                title="Next Week"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            </div>
+
             <button
               onClick={() => setIsFormOpen(true)}
               className="flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-zinc-800 hover:shadow-md active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 w-full sm:w-auto"
@@ -130,14 +181,34 @@ export default function Home() {
               <thead className="border-b border-zinc-200 bg-zinc-50/50 dark:border-zinc-800 dark:bg-zinc-900/50">
                 <tr>
                   <th className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 min-w-[300px]">Task Title</th>
-                  {dateColumns.map((date, i) => (
-                    <th key={i} className="px-6 py-4 font-medium text-zinc-500 dark:text-zinc-400 text-center border-l border-zinc-200 dark:border-zinc-800 min-w-[100px]">
-                      <div className="flex flex-col">
-                        <span className="text-xs uppercase tracking-wider">{date.toLocaleDateString('en-US', { weekday: 'short' })}</span>
-                        <span className="text-zinc-900 dark:text-zinc-50 mt-1">{date.getDate()}</span>
-                      </div>
-                    </th>
-                  ))}
+                  {dateColumns.map((date, i) => {
+                    const today = isToday(date);
+                    return (
+                      <th
+                        key={i}
+                        className={`px-6 py-4 font-medium text-center border-l border-zinc-200 dark:border-zinc-800 min-w-[100px] ${
+                          today
+                            ? "bg-blue-50/40 dark:bg-blue-950/20 text-blue-600 dark:text-blue-400"
+                            : "text-zinc-500 dark:text-zinc-400"
+                        }`}
+                      >
+                        <div className="flex flex-col">
+                          <span className="text-xs uppercase tracking-wider">
+                            {date.toLocaleDateString("en-US", { weekday: "short" })}
+                          </span>
+                          <span
+                            className={`mt-1 ${
+                              today
+                                ? "text-blue-600 dark:text-blue-400 font-bold"
+                                : "text-zinc-900 dark:text-zinc-50"
+                            }`}
+                          >
+                            {date.getDate()}
+                          </span>
+                        </div>
+                      </th>
+                    );
+                  })}
                 </tr>
               </thead>
               <tbody className="divide-y divide-zinc-200 dark:divide-zinc-800">
@@ -159,11 +230,16 @@ export default function Home() {
                       {dateColumns.map((date, i) => {
                         const dateStr = date.toISOString().split('T')[0];
                         const isMarked = task.completedDates?.includes(dateStr);
+                        const today = isToday(date);
                         return (
                           <td
                             key={i}
                             onClick={() => toggleTaskDate(task.id, date)}
-                            className="px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors hover:bg-zinc-100 dark:hover:bg-zinc-800 cursor-pointer"
+                            className={`px-6 py-4 border-l border-zinc-200 dark:border-zinc-800 transition-colors cursor-pointer ${
+                              today
+                                ? "bg-blue-50/10 dark:bg-blue-950/5 hover:bg-blue-50/20 dark:hover:bg-blue-950/15"
+                                : "hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                            }`}
                           >
                             <div className="flex items-center justify-center min-h-[1.5rem]">
                               {isMarked ? (
