@@ -105,9 +105,9 @@ export default function Home() {
           <div className="flex flex-col sm:flex-row items-center gap-4">
             <button
               onClick={() => setIsFormOpen(true)}
-              className="flex items-center justify-center gap-2 rounded-2xl bg-zinc-900 px-8 py-4 font-bold text-white transition-all hover:bg-zinc-800 hover:shadow-xl active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 w-full sm:w-auto"
+              className="flex items-center justify-center gap-1.5 rounded-xl bg-zinc-900 px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-zinc-800 hover:shadow-md active:scale-95 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 w-full sm:w-auto"
             >
-              <Plus className="h-5 w-5" />
+              <Plus className="h-4 w-4" />
               New Task
             </button>
           </div>
