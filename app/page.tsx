@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { Plus, X, Check, Menu, MoreVertical, Trash2, ChevronLeft, ChevronRight } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
@@ -43,6 +43,8 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editingTabData, setEditingTabData] = useState<TabData | null>(null);
 
+  const initialized = useRef(false);
+
   const [startDate, setStartDate] = useState<Date>(() => {
     const d = new Date();
     d.setDate(d.getDate() - 7);
@@ -72,40 +74,35 @@ export default function Home() {
     );
   };
 
+  // Load from file on mount
   useEffect(() => {
-    const savedTasks = localStorage.getItem("event-handler-tasks");
-    if (savedTasks) {
-      try {
-        setTasks(JSON.parse(savedTasks));
-      } catch {
-        console.error("Failed to parse tasks from localStorage");
-      }
-    }
-    const savedTabs = localStorage.getItem("event-handler-tabs");
-    if (savedTabs) {
-      try {
-        const parsed: TabData[] = JSON.parse(savedTabs);
-        if (parsed && parsed.length > 0) {
-          const restored = parsed.map(Tab.fromPlain);
+    fetch("/api/data")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data.tasks?.length) setTasks(data.tasks);
+        if (data.tabs?.length) {
+          const restored = (data.tabs as TabData[]).map(Tab.fromPlain);
           setTabs(restored);
           setActiveTabId(restored[0].getId());
         }
-      } catch {
-        console.error("Failed to parse tabs from localStorage");
-      }
-    }
+      })
+      .finally(() => {
+        initialized.current = true;
+      });
   }, []);
 
+  // Debounced save to file on every change
   useEffect(() => {
-    localStorage.setItem("event-handler-tasks", JSON.stringify(tasks));
-  }, [tasks]);
-
-  useEffect(() => {
-    localStorage.setItem(
-      "event-handler-tabs",
-      JSON.stringify(tabs.map((t) => t.toPlain()))
-    );
-  }, [tabs]);
+    if (!initialized.current) return;
+    const timer = setTimeout(() => {
+      fetch("/api/data", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ tasks, tabs: tabs.map((t) => t.toPlain()) }),
+      });
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [tasks, tabs]);
 
   const dateColumns = Array.from({ length: 30 }).map((_, i) => {
     const d = new Date(startDate);
