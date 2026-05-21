@@ -7,7 +7,6 @@ export interface TabData {
     icon: string;
     color: string;
 }
-
 export class Tab {
     private tabName: string;
     private id: string;
