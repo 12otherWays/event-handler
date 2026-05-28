@@ -23,6 +23,7 @@ import {
 import {
   Sheet,
   SheetContent,
+  SheetClose,
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
@@ -390,43 +391,52 @@ export default function Home() {
         open={!!selectedTask}
         onOpenChange={(open) => { if (!open) { setSelectedTask(null); setEditingDescription(null); } }}
       >
-        <SheetContent className="w-full max-w-md flex flex-col p-0">
+        <SheetContent className="w-full max-w-md flex flex-col p-0" showCloseButton={false}>
           <SheetHeader className="p-6 border-b">
-            <div className="flex items-center justify-between">
-              <SheetTitle>{selectedTask?.title}</SheetTitle>
-              {editingDescription === null ? (
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-8 w-8"
-                  onClick={() => setEditingDescription(selectedTask?.description ?? "")}
-                  title="Edit description"
-                >
-                  <Pencil className="h-4 w-4" />
-                </Button>
-              ) : (
-                <div className="flex gap-1">
+            <div className="flex items-center justify-between gap-2">
+              <SheetTitle className="truncate">{selectedTask?.title}</SheetTitle>
+              <div className="flex items-center gap-1 shrink-0">
+                {editingDescription === null ? (
                   <Button
-                    size="sm"
-                    onClick={() => {
-                      setTasks((prev) =>
-                        prev.map((t) =>
-                          t.id === selectedTask!.id
-                            ? { ...t, description: editingDescription }
-                            : t
-                        )
-                      );
-                      setSelectedTask((prev) => prev ? { ...prev, description: editingDescription } : prev);
-                      setEditingDescription(null);
-                    }}
+                    variant="ghost"
+                    size="icon"
+                    className="h-8 w-8"
+                    onClick={() => setEditingDescription(selectedTask?.description ?? "")}
+                    title="Edit description"
                   >
-                    Save
+                    <Pencil className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="sm" onClick={() => setEditingDescription(null)}>
-                    Cancel
-                  </Button>
-                </div>
-              )}
+                ) : (
+                  <>
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setTasks((prev) =>
+                          prev.map((t) =>
+                            t.id === selectedTask!.id
+                              ? { ...t, description: editingDescription }
+                              : t
+                          )
+                        );
+                        setSelectedTask((prev) => prev ? { ...prev, description: editingDescription } : prev);
+                        setEditingDescription(null);
+                      }}
+                    >
+                      Save
+                    </Button>
+                    <Button variant="ghost" size="sm" onClick={() => setEditingDescription(null)}>
+                      Cancel
+                    </Button>
+                  </>
+                )}
+                <SheetClose
+                  render={
+                    <Button variant="ghost" size="icon" className="h-8 w-8" title="Close" />
+                  }
+                >
+                  <X className="h-4 w-4" />
+                </SheetClose>
+              </div>
             </div>
           </SheetHeader>
           <div className="p-6 overflow-y-auto flex-1">
