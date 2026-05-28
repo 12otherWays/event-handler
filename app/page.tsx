@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { Plus, X, Check, Menu, MoreVertical, Trash2, ChevronLeft, ChevronRight, Sun, Moon } from "lucide-react";
+import { Plus, X, Check, Menu, MoreVertical, Trash2, ChevronLeft, ChevronRight, Sun, Moon, Pencil } from "lucide-react";
 import { useTheme } from "next-themes";
 import ReactMarkdown from "react-markdown";
 import { Task } from "@/lib/types";
@@ -44,6 +44,7 @@ export default function Home() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [editingTabData, setEditingTabData] = useState<TabData | null>(null);
+  const [editingDescription, setEditingDescription] = useState<string | null>(null);
 
   const initialized = useRef(false);
 
@@ -237,11 +238,10 @@ export default function Home() {
                     return (
                       <TableHead
                         key={i}
-                        className={`min-w-[90px] border-l px-4 py-4 text-center font-medium ${
-                          today
+                        className={`min-w-[90px] border-l px-4 py-4 text-center font-medium ${today
                             ? "bg-blue-50/60 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
                             : "text-muted-foreground"
-                        }`}
+                          }`}
                       >
                         <div className="flex flex-col items-center">
                           <span className="text-xs uppercase tracking-wider">
@@ -250,11 +250,10 @@ export default function Home() {
                             })}
                           </span>
                           <span
-                            className={`mt-0.5 text-sm ${
-                              today
+                            className={`mt-0.5 text-sm ${today
                                 ? "font-bold text-blue-600 dark:text-blue-400"
                                 : "text-foreground"
-                            }`}
+                              }`}
                           >
                             {date.getDate()}
                           </span>
@@ -290,11 +289,10 @@ export default function Home() {
                         <TableCell
                           key={i}
                           onClick={() => toggleTaskDate(task.id, date)}
-                          className={`border-l px-4 py-4 cursor-pointer transition-colors ${
-                            today
+                          className={`border-l px-4 py-4 cursor-pointer transition-colors ${today
                               ? "bg-blue-50/20 hover:bg-blue-50/40 dark:bg-blue-950/10 dark:hover:bg-blue-950/20"
                               : "hover:bg-muted/50"
-                          }`}
+                            }`}
                         >
                           <div className="flex items-center justify-center min-h-[1.5rem]">
                             {isMarked ? (
@@ -354,11 +352,10 @@ export default function Home() {
                   <button
                     key={tab.getId()}
                     onClick={() => setActiveTabId(tab.getId())}
-                    className={`relative px-4 py-2 text-sm font-medium border-r min-w-[120px] max-w-[200px] text-left transition-colors group/tab flex-shrink-0 flex items-center justify-between ${
-                      isActive
+                    className={`relative px-4 py-2 text-sm font-medium border-r min-w-[120px] max-w-[200px] text-left transition-colors group/tab flex-shrink-0 flex items-center justify-between ${isActive
                         ? "bg-background text-foreground"
                         : "bg-transparent text-muted-foreground hover:bg-muted/50"
-                    }`}
+                      }`}
                     style={isActive ? { color: tabColor } : {}}
                   >
                     <span className="truncate block pr-2">
@@ -391,18 +388,9 @@ export default function Home() {
       {/* Task description side drawer */}
       <Sheet
         open={!!selectedTask}
-        onOpenChange={(open) => !open && setSelectedTask(null)}
+        onOpenChange={(open) => { if (!open) { setSelectedTask(null); setEditingDescription(null); } }}
       >
-        <SheetContent className="w-full max-w-md flex flex-col p-0">
-          <SheetHeader className="p-6 border-b">
-            <SheetTitle>{selectedTask?.title}</SheetTitle>
-          </SheetHeader>
-          <div className="p-6 overflow-y-auto flex-1 prose prose-sm sm:prose-base prose-zinc dark:prose-invert max-w-none text-muted-foreground">
-            {selectedTask?.description && (
-              <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
-            )}
-          </div>
-        </SheetContent>
+
       </Sheet>
 
       {/* Edit Sheet Dialog */}
