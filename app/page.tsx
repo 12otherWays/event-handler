@@ -239,8 +239,8 @@ export default function Home() {
                       <TableHead
                         key={i}
                         className={`min-w-[90px] border-l px-4 py-4 text-center font-medium ${today
-                            ? "bg-blue-50/60 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
-                            : "text-muted-foreground"
+                          ? "bg-blue-50/60 text-blue-600 dark:bg-blue-950/20 dark:text-blue-400"
+                          : "text-muted-foreground"
                           }`}
                       >
                         <div className="flex flex-col items-center">
@@ -251,8 +251,8 @@ export default function Home() {
                           </span>
                           <span
                             className={`mt-0.5 text-sm ${today
-                                ? "font-bold text-blue-600 dark:text-blue-400"
-                                : "text-foreground"
+                              ? "font-bold text-blue-600 dark:text-blue-400"
+                              : "text-foreground"
                               }`}
                           >
                             {date.getDate()}
@@ -290,8 +290,8 @@ export default function Home() {
                           key={i}
                           onClick={() => toggleTaskDate(task.id, date)}
                           className={`border-l px-4 py-4 cursor-pointer transition-colors ${today
-                              ? "bg-blue-50/20 hover:bg-blue-50/40 dark:bg-blue-950/10 dark:hover:bg-blue-950/20"
-                              : "hover:bg-muted/50"
+                            ? "bg-blue-50/20 hover:bg-blue-50/40 dark:bg-blue-950/10 dark:hover:bg-blue-950/20"
+                            : "hover:bg-muted/50"
                             }`}
                         >
                           <div className="flex items-center justify-center min-h-[1.5rem]">
@@ -353,8 +353,8 @@ export default function Home() {
                     key={tab.getId()}
                     onClick={() => setActiveTabId(tab.getId())}
                     className={`relative px-4 py-2 text-sm font-medium border-r min-w-[120px] max-w-[200px] text-left transition-colors group/tab flex-shrink-0 flex items-center justify-between ${isActive
-                        ? "bg-background text-foreground"
-                        : "bg-transparent text-muted-foreground hover:bg-muted/50"
+                      ? "bg-background text-foreground"
+                      : "bg-transparent text-muted-foreground hover:bg-muted/50"
                       }`}
                     style={isActive ? { color: tabColor } : {}}
                   >
@@ -390,7 +390,62 @@ export default function Home() {
         open={!!selectedTask}
         onOpenChange={(open) => { if (!open) { setSelectedTask(null); setEditingDescription(null); } }}
       >
-
+        <SheetContent className="w-full max-w-md flex flex-col p-0">
+          <SheetHeader className="p-6 border-b">
+            <div className="flex items-center justify-between">
+              <SheetTitle>{selectedTask?.title}</SheetTitle>
+              {editingDescription === null ? (
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8"
+                  onClick={() => setEditingDescription(selectedTask?.description ?? "")}
+                  title="Edit description"
+                >
+                  <Pencil className="h-4 w-4" />
+                </Button>
+              ) : (
+                <div className="flex gap-1">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setTasks((prev) =>
+                        prev.map((t) =>
+                          t.id === selectedTask!.id
+                            ? { ...t, description: editingDescription }
+                            : t
+                        )
+                      );
+                      setSelectedTask((prev) => prev ? { ...prev, description: editingDescription } : prev);
+                      setEditingDescription(null);
+                    }}
+                  >
+                    Save
+                  </Button>
+                  <Button variant="ghost" size="sm" onClick={() => setEditingDescription(null)}>
+                    Cancel
+                  </Button>
+                </div>
+              )}
+            </div>
+          </SheetHeader>
+          <div className="p-6 overflow-y-auto flex-1">
+            {editingDescription !== null ? (
+              <textarea
+                className="w-full h-full min-h-[60vh] resize-none rounded-md border bg-background p-3 text-sm font-mono focus:outline-none focus:ring-2 focus:ring-ring"
+                value={editingDescription}
+                onChange={(e) => setEditingDescription(e.target.value)}
+                autoFocus
+              />
+            ) : (
+              <div className="prose prose-sm sm:prose-base prose-zinc dark:prose-invert max-w-none text-muted-foreground">
+                {selectedTask?.description && (
+                  <ReactMarkdown>{selectedTask.description}</ReactMarkdown>
+                )}
+              </div>
+            )}
+          </div>
+        </SheetContent>
       </Sheet>
 
       {/* Edit Sheet Dialog */}
