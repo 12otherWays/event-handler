@@ -362,16 +362,24 @@ export default function Home() {
                     <span className="truncate block pr-2">
                       {tab.getTabName()}
                     </span>
-                    <button
+                    <div
+                      role="button"
+                      tabIndex={0}
                       onClick={(e) => {
                         e.stopPropagation();
                         setEditingTabData(tab.toPlain());
                       }}
-                      className="p-1 rounded hover:bg-muted opacity-0 group-hover/tab:opacity-100 transition-opacity"
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" || e.key === " ") {
+                          e.stopPropagation();
+                          setEditingTabData(tab.toPlain());
+                        }
+                      }}
+                      className="p-1 rounded hover:bg-muted opacity-0 group-hover/tab:opacity-100 transition-opacity cursor-pointer"
                       title="Edit Sheet"
                     >
                       <MoreVertical className="h-3 w-3 text-muted-foreground" />
-                    </button>
+                    </div>
                     {isActive && (
                       <div
                         className="absolute bottom-0 left-0 right-0 h-[2px]"
