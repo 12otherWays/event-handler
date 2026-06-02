@@ -2,25 +2,15 @@
 
 import React from "react";
 import ReactMarkdown from "react-markdown";
-import {
-  ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Cell,
-} from "recharts";
 import { CheckCircle2, Circle, Clock, MoreVertical } from "lucide-react";
 import { Task } from "@/lib/types";
 import { cn } from "@/lib/utils";
+import { TaskChart } from "./TaskChart";
 
 interface TaskCardProps {
   task: Task;
   onToggleStatus: (id: string) => void;
 }
-
-const COLORS = ["#3b82f6", "#10b981", "#f59e0b", "#ef4444", "#8b5cf6", "#6d9f2dff"];
 
 export function TaskCard({ task, onToggleStatus }: TaskCardProps) {
   const isCompleted = task.status === "completed";
