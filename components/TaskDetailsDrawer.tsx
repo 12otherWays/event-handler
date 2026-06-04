@@ -41,7 +41,7 @@ export function TaskDetailsDrawer({
           <div className="flex items-center justify-between gap-2">
             <SheetTitle className="truncate">{task?.title}</SheetTitle>
             <div className="flex items-center gap-1 shrink-0">
-              {editingDescription === null ? (
+              {editingDescription === null && (
                 <Button
                   variant="ghost"
                   size="icon"
@@ -51,15 +51,6 @@ export function TaskDetailsDrawer({
                 >
                   <Pencil className="h-4 w-4" />
                 </Button>
-              ) : (
-                <>
-                  <Button size="sm" onClick={onSave}>
-                    Save
-                  </Button>
-                  <Button variant="ghost" size="sm" onClick={onCancelEditing}>
-                    Cancel
-                  </Button>
-                </>
               )}
               <SheetClose
                 render={
@@ -92,6 +83,16 @@ export function TaskDetailsDrawer({
             </div>
           )}
         </div>
+        {editingDescription !== null && (
+          <div className="flex items-center justify-end gap-2 border-t p-6">
+            <Button variant="ghost" size="sm" onClick={onCancelEditing}>
+              Cancel
+            </Button>
+            <Button size="sm" onClick={onSave}>
+              Save
+            </Button>
+          </div>
+        )}
       </SheetContent>
     </Sheet>
   );
